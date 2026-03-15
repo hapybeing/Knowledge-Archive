@@ -1,0 +1,23 @@
+[
+  {
+    "id": "physics",
+    "category": "physics",
+    "title": "Quantum Mechanics",
+    "coordinates": [-5, 2, -10],
+    "color": "#00f3ff"
+  },
+  {
+    "id": "ai",
+    "category": "ai",
+    "title": "Neural Architectures",
+    "coordinates": [4, -1, -15],
+    "color": "#b026ff"
+  },
+  {
+    "id": "mathematics",
+    "category": "mathematics",
+    "title": "Fractal Geometry",
+    "coordinates": [1, 4, -20],
+    "color": "#003cff"
+  }
+]
