@@ -43,8 +43,11 @@ export default function CameraRig() {
       if (!targetNode) return;
 
       const [x, y, z] = targetNode.coordinates;
-      const targetPosition = new THREE.Vector3(x, y, z + 3.5);
-      const lookAtTarget = new THREE.Vector3(x, y, z);
+      
+      // PULL BACK to make it feel massive, and offset the camera X position
+      // so the object ends up framed on the right side of the screen.
+      const targetPosition = new THREE.Vector3(x - 2, y, z + 6); 
+      const lookAtTarget = new THREE.Vector3(x - 2, y, z);
 
       const ctx = gsap.context(() => {
         const tl = gsap.timeline({
