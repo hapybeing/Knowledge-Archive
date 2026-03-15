@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import { useStore } from "@/store/useStore";
 import ScrollManager from "@/components/dom/ScrollManager";
 import SplitText from "@/components/dom/ui/SplitText";
@@ -15,13 +15,16 @@ export default function Home() {
   const viewState = useStore((state) => state.viewState);
   const setContactOpen = useStore((state) => state.setContactOpen);
 
+  // GUARANTEE scroll resets to the very top when you enter or exit a node
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [viewState]);
+
   return (
-    // REMOVED: overflow-hidden. We need the universe to flow.
     <main className="relative w-full min-h-screen bg-[#010103] selection:bg-neonCyan selection:text-space">
       <ScrollManager />
       <FounderModal />
       
-      {/* Global Header */}
       <header className="fixed top-0 left-0 z-50 w-full p-8 md:p-12 flex justify-between items-center pointer-events-none">
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
@@ -43,10 +46,8 @@ export default function Home() {
         </motion.button>
       </header>
 
-      {/* Deep Shadow Protection Layer - ensures text is ALWAYS readable */}
       <div className="fixed top-0 left-0 w-full md:w-[60%] h-full bg-gradient-to-r from-[#010103] via-[#010103]/90 to-transparent z-10 pointer-events-none" />
 
-      {/* Welcome Sequence (Macro View Only) */}
       <AnimatePresence>
         {viewState === 'macro' && (
           <motion.div 
@@ -55,7 +56,7 @@ export default function Home() {
           >
             <SplitText 
               text="Welcome to the sum of human understanding."
-              className="text-4xl md:text-6xl lg:text-8xl font-light tracking-tighter text-white max-w-5xl"
+              className="text-4xl md:text-6xl lg:text-8xl font-light tracking-tighter text-white max-w-5xl drop-shadow-2xl"
               highlightWords={["sum", "understanding."]}
               delay={0.1}
             />
@@ -71,19 +72,16 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      {/* The Inner World Overlay - Now properly scrollable */}
       <AnimatePresence>
         {viewState === 'micro' && <InnerWorldScroll />}
       </AnimatePresence>
 
-      {/* The 3D Engine */}
       <div className="fixed top-0 left-0 w-full h-screen z-0">
         <Suspense fallback={null}>
           <Scene />
         </Suspense>
       </div>
 
-      {/* Main Scroll Track - Only active in macro mode */}
       {viewState === 'macro' && (
         <div className="w-full h-[5000vh] pointer-events-none relative z-10" />
       )}
