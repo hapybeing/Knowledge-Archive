@@ -15,7 +15,9 @@ interface KnowledgeNodeProps {
 export default function KnowledgeNode({ id, position, color }: KnowledgeNodeProps) {
   const meshRef = useRef<THREE.Mesh>(null)
   const materialRef = useRef<THREE.ShaderMaterial>(null)
-  const { setActiveNode, setViewState } = useStore()
+  const activeNode = useStore((state) => state.activeNode)
+  const setActiveNode = useStore((state) => state.setActiveNode)
+  const setViewState = useStore((state) => state.setViewState)
 
   const uniforms = useMemo(
     () => ({
@@ -29,14 +31,26 @@ export default function KnowledgeNode({ id, position, color }: KnowledgeNodeProp
     if (materialRef.current) {
       materialRef.current.uniforms.uTime.value = state.clock.elapsedTime
     }
+    
     if (meshRef.current) {
+      // Rotate the shell
       meshRef.current.rotation.y += 0.005
       meshRef.current.rotation.z += 0.002
+
+      // THE MAGIC TRICK:
+      // If this node is clicked, scale it up massively (to 15).
+      // The camera will pass through the geometry, making the shell invisible 
+      // and revealing the high-end micro-world inside.
+      const targetScale = activeNode === id ? 15 : 1;
+      meshRef.current.scale.lerp(
+        new THREE.Vector3(targetScale, targetScale, targetScale), 
+        0.04
+      );
     }
   })
 
   const handlePointerOver = () => {
-    document.body.style.cursor = 'crosshair'
+    if (!activeNode) document.body.style.cursor = 'crosshair'
   }
 
   const handlePointerOut = () => {
@@ -44,8 +58,10 @@ export default function KnowledgeNode({ id, position, color }: KnowledgeNodeProp
   }
 
   const handleClick = () => {
+    if (activeNode) return; // Prevent clicking if already inside
     setActiveNode(id)
     setViewState('transition')
+    document.body.style.cursor = 'auto'
   }
 
   return (
@@ -65,6 +81,7 @@ export default function KnowledgeNode({ id, position, color }: KnowledgeNodeProp
           transparent
           blending={THREE.AdditiveBlending}
           depthWrite={false}
+          side={THREE.FrontSide} // Ensures it becomes invisible when we are inside it
         />
       </mesh>
       
