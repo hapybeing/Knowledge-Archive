@@ -12,6 +12,8 @@ export default function ConstellationGraph() {
           id={node.id}
           position={node.coordinates as [number, number, number]}
           color={node.color}
+          title={node.title}
+          category={node.category}
         />
       ))}
     </group>
