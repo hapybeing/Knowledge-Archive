@@ -11,11 +11,9 @@ export default function Effects() {
   const viewState = useStore((state) => state.viewState);
   const chromaticRef = useRef<any>(null);
 
-  // Dynamically animate the chromatic aberration based on camera travel
   useFrame((state, delta) => {
     if (chromaticRef.current) {
-      // High distortion during 'transition' (warp speed), subtle otherwise
-      const targetOffset = viewState === 'transition' ? 0.04 : 0.002;
+      const targetOffset = viewState === 'transition' ? 0.04 : 0.0015; // Toned down resting aberration
       
       chromaticRef.current.offset.x = THREE.MathUtils.lerp(
         chromaticRef.current.offset.x, 
@@ -32,36 +30,32 @@ export default function Effects() {
 
   return (
     <EffectComposer disableNormalPass multisampling={0}>
-      {/* Threshold controls what glows. 
-        MipmapBlur creates a cinematic, physically accurate light scatter.
-      */}
+      {/* Toned down intensity, raised threshold. Only the core glows now. */}
       <Bloom 
-        luminanceThreshold={0.2} 
+        luminanceThreshold={0.6} 
         luminanceSmoothing={0.9} 
-        intensity={1.5} 
+        intensity={0.8} 
         mipmapBlur 
       />
       
-      {/* RGB split effect. Tied to the ref so we can animate it via useFrame.
-      */}
       <ChromaticAberration 
         ref={chromaticRef}
         blendFunction={BlendFunction.NORMAL} 
-        offset={new THREE.Vector2(0.002, 0.002)}
+        offset={new THREE.Vector2(0.0015, 0.0015)}
       />
       
-      {/* Subtle film grain to prevent banding in dark areas */}
+      {/* Increased grain slightly for texture */}
       <Noise 
         premultiply 
         blendFunction={BlendFunction.SCREEN} 
-        opacity={0.3} 
+        opacity={0.4} 
       />
       
-      {/* Darkens the edges to keep the user focused on the center */}
+      {/* Much heavier vignette to create a spotlight effect in the center/right */}
       <Vignette 
         eskil={false} 
-        offset={0.1} 
-        darkness={1.1} 
+        offset={0.2} 
+        darkness={1.5} 
       />
     </EffectComposer>
   );
