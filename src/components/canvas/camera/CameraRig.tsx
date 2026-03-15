@@ -16,22 +16,33 @@ export default function CameraRig() {
   
   const isTransitioning = useRef(false);
 
+  // The master flight path. Offsets ensure nodes appear on the right side of the screen.
   const curve = useMemo(() => {
     return new THREE.CatmullRomCurve3([
-      new THREE.Vector3(0, 0, 15),
-      new THREE.Vector3(2, 2, 0),
-      new THREE.Vector3(-3, -1, -10),
-      new THREE.Vector3(1, 4, -25),
-      new THREE.Vector3(0, 0, -40),
+      new THREE.Vector3(0, 0, 15),               // Start
+      new THREE.Vector3(1, 2, -10 + 6),          // Physics approach
+      new THREE.Vector3(-6, -1, -30 + 6),        // AI approach
+      new THREE.Vector3(0, 3, -50 + 6),          // Math approach
+      new THREE.Vector3(-5, 1, -70 + 6),         // Cybernetics approach
+      new THREE.Vector3(-2, -2, -90 + 6),        // Cosmology approach
+      new THREE.Vector3(0, 0, -110),             // Deep space
     ]);
   }, []);
 
   useFrame(() => {
     if (viewState === 'macro' && !isTransitioning.current) {
+      // Map scroll progress (0-1) to the curve length
       const point = curve.getPointAt(scrollProgress);
-      const lookAtPoint = curve.getPointAt(Math.min(1, scrollProgress + 0.05));
+      const lookAtPoint = curve.getPointAt(Math.min(1, scrollProgress + 0.02));
       
-      camera.position.lerp(point, 0.1);
+      camera.position.lerp(point, 0.08); // Smooth dampening
+      
+      // Add subtle mouse sway for a premium feel
+      const mouseX = (window.innerWidth / 2 - window.innerWidth) * 0.0005;
+      const mouseY = (window.innerHeight / 2 - window.innerHeight) * 0.0005;
+      lookAtPoint.x += mouseX;
+      lookAtPoint.y += mouseY;
+      
       camera.lookAt(lookAtPoint);
     }
   });
@@ -43,9 +54,6 @@ export default function CameraRig() {
       if (!targetNode) return;
 
       const [x, y, z] = targetNode.coordinates;
-      
-      // PULL BACK to make it feel massive, and offset the camera X position
-      // so the object ends up framed on the right side of the screen.
       const targetPosition = new THREE.Vector3(x - 2, y, z + 6); 
       const lookAtTarget = new THREE.Vector3(x - 2, y, z);
 
@@ -58,7 +66,7 @@ export default function CameraRig() {
         });
 
         tl.to(camera as THREE.PerspectiveCamera, {
-          fov: 110,
+          fov: 100,
           duration: 0.8,
           ease: "power2.in",
           onUpdate: () => (camera as THREE.PerspectiveCamera).updateProjectionMatrix(),
@@ -68,24 +76,24 @@ export default function CameraRig() {
           x: targetPosition.x,
           y: targetPosition.y,
           z: targetPosition.z,
-          duration: 2.2,
-          ease: "power4.inOut",
+          duration: 1.8,
+          ease: "power3.inOut",
           onUpdate: () => camera.lookAt(lookAtTarget),
         }, 0);
 
         tl.to(camera as THREE.PerspectiveCamera, {
           fov: 45,
-          duration: 1.0,
+          duration: 0.8,
           ease: "power3.out",
           onUpdate: () => (camera as THREE.PerspectiveCamera).updateProjectionMatrix(),
-        }, 1.2);
+        }, 1.0);
       });
 
       return () => ctx.revert();
     } else if (viewState === 'micro') {
       isTransitioning.current = true;
       const returnPoint = curve.getPointAt(scrollProgress);
-      const returnLookAt = curve.getPointAt(Math.min(1, scrollProgress + 0.05));
+      const returnLookAt = curve.getPointAt(Math.min(1, scrollProgress + 0.02));
 
       const ctx = gsap.context(() => {
         const tl = gsap.timeline({
@@ -96,7 +104,7 @@ export default function CameraRig() {
         });
 
         tl.to(camera as THREE.PerspectiveCamera, {
-          fov: 90,
+          fov: 80,
           duration: 0.6,
           ease: "power2.in",
           onUpdate: () => (camera as THREE.PerspectiveCamera).updateProjectionMatrix(),
@@ -106,17 +114,17 @@ export default function CameraRig() {
           x: returnPoint.x,
           y: returnPoint.y,
           z: returnPoint.z,
-          duration: 2.2,
-          ease: "power4.inOut",
+          duration: 1.8,
+          ease: "power3.inOut",
           onUpdate: () => camera.lookAt(returnLookAt),
         }, 0);
 
         tl.to(camera as THREE.PerspectiveCamera, {
           fov: 45,
-          duration: 1.0,
+          duration: 0.8,
           ease: "power3.out",
           onUpdate: () => (camera as THREE.PerspectiveCamera).updateProjectionMatrix(),
-        }, 1.2);
+        }, 1.0);
       });
 
       return () => ctx.revert();
