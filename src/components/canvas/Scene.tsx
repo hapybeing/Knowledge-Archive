@@ -5,6 +5,7 @@ import { Preload } from "@react-three/drei";
 import InstancedStarfield from "./environment/InstancedStarfield";
 import ConstellationGraph from "./nodes/ConstellationGraph";
 import ActiveWorldContainer from "./worlds/ActiveWorldContainer";
+import CameraRig from "./camera/CameraRig";
 
 export default function Scene() {
   return (
@@ -15,6 +16,8 @@ export default function Scene() {
     >
       <color attach="background" args={["#030305"]} />
       <ambientLight intensity={0.2} />
+      
+      <CameraRig />
       
       <InstancedStarfield count={15000} />
       <ConstellationGraph />
