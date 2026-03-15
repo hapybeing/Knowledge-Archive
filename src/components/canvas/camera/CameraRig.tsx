@@ -16,15 +16,16 @@ export default function CameraRig() {
   
   const isTransitioning = useRef(false);
 
+  // Updated curve to match the new deep-space coordinates
   const curve = useMemo(() => {
     return new THREE.CatmullRomCurve3([
-      new THREE.Vector3(0, 0, 15),               
-      new THREE.Vector3(1, 2, -10 + 6),          
-      new THREE.Vector3(-6, -1, -30 + 6),        
-      new THREE.Vector3(0, 3, -50 + 6),          
-      new THREE.Vector3(-5, 1, -70 + 6),         
-      new THREE.Vector3(-2, -2, -90 + 6),        
-      new THREE.Vector3(0, 0, -110),             
+      new THREE.Vector3(0, 0, 15),               // Start (Clean view, no orbs)
+      new THREE.Vector3(1, 2, -40 + 6),          // Physics approach
+      new THREE.Vector3(-6, -1, -80 + 6),        // AI approach
+      new THREE.Vector3(0, 3, -120 + 6),         // Math approach
+      new THREE.Vector3(-5, 1, -160 + 6),        // Cybernetics approach
+      new THREE.Vector3(-2, -2, -200 + 6),       // Cosmology approach
+      new THREE.Vector3(0, 0, -240),             // Deep space end
     ]);
   }, []);
 
@@ -52,8 +53,7 @@ export default function CameraRig() {
 
       const [x, y, z] = targetNode.coordinates;
       
-      // FIXED: Massive X offset to push the orb to the far right of the screen
-      // so it never overlaps the FWA typography on tablets or mobile.
+      // Pushes the orb to the right side of the screen when clicked
       const targetPosition = new THREE.Vector3(x + 4, y, z + 6); 
       const lookAtTarget = new THREE.Vector3(x + 4, y, z);
 
