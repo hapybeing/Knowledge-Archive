@@ -8,11 +8,14 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        space: "#030305",
+        space: "#010103",
         neonCyan: "#00f3ff",
         electricBlue: "#003cff",
         violet: "#b026ff",
       },
+      fontFamily: {
+        serif: ['"Playfair Display"', 'Georgia', 'serif'],
+      }
     },
   },
   plugins: [],
