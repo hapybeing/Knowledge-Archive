@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import gsap from "gsap";
 import * as THREE from "three";
@@ -16,31 +16,24 @@ export default function CameraRig() {
   
   const isTransitioning = useRef(false);
 
-  // Updated curve to match the new deep-space coordinates
-  const curve = useMemo(() => {
-    return new THREE.CatmullRomCurve3([
-      new THREE.Vector3(0, 0, 15),               // Start (Clean view, no orbs)
-      new THREE.Vector3(1, 2, -40 + 6),          // Physics approach
-      new THREE.Vector3(-6, -1, -80 + 6),        // AI approach
-      new THREE.Vector3(0, 3, -120 + 6),         // Math approach
-      new THREE.Vector3(-5, 1, -160 + 6),        // Cybernetics approach
-      new THREE.Vector3(-2, -2, -200 + 6),       // Cosmology approach
-      new THREE.Vector3(0, 0, -240),             // Deep space end
-    ]);
-  }, []);
+  // The lowest point the camera will travel (matching our lowest node)
+  const maxDepth = -110; 
 
   useFrame(() => {
     if (viewState === 'macro' && !isTransitioning.current) {
-      const point = curve.getPointAt(scrollProgress);
-      const lookAtPoint = curve.getPointAt(Math.min(1, scrollProgress + 0.02));
+      // Linearly map scroll (0 to 1) to the Y axis (0 to -110)
+      const targetY = scrollProgress * maxDepth;
       
-      camera.position.lerp(point, 0.08); 
+      const targetPosition = new THREE.Vector3(0, targetY, 15);
+      const lookAtPoint = new THREE.Vector3(0, targetY, 0);
       
+      // Subtle mouse sway
       const mouseX = (window.innerWidth / 2 - window.innerWidth) * 0.0005;
       const mouseY = (window.innerHeight / 2 - window.innerHeight) * 0.0005;
       lookAtPoint.x += mouseX;
       lookAtPoint.y += mouseY;
-      
+
+      camera.position.lerp(targetPosition, 0.1);
       camera.lookAt(lookAtPoint);
     }
   });
@@ -53,9 +46,9 @@ export default function CameraRig() {
 
       const [x, y, z] = targetNode.coordinates;
       
-      // Pushes the orb to the right side of the screen when clicked
-      const targetPosition = new THREE.Vector3(x + 4, y, z + 6); 
-      const lookAtTarget = new THREE.Vector3(x + 4, y, z);
+      // Dive slightly past the orb's center on the Z-axis
+      const targetPosition = new THREE.Vector3(x, y, z + 6); 
+      const lookAtTarget = new THREE.Vector3(x, y, z);
 
       const ctx = gsap.context(() => {
         const tl = gsap.timeline({
@@ -67,7 +60,7 @@ export default function CameraRig() {
 
         tl.to(camera as THREE.PerspectiveCamera, {
           fov: 90,
-          duration: 0.8,
+          duration: 0.6,
           ease: "power2.in",
           onUpdate: () => (camera as THREE.PerspectiveCamera).updateProjectionMatrix(),
         }, 0);
@@ -76,24 +69,25 @@ export default function CameraRig() {
           x: targetPosition.x,
           y: targetPosition.y,
           z: targetPosition.z,
-          duration: 1.8,
+          duration: 1.5,
           ease: "power3.inOut",
           onUpdate: () => camera.lookAt(lookAtTarget),
         }, 0);
 
         tl.to(camera as THREE.PerspectiveCamera, {
           fov: 45,
-          duration: 0.8,
+          duration: 0.6,
           ease: "power3.out",
           onUpdate: () => (camera as THREE.PerspectiveCamera).updateProjectionMatrix(),
-        }, 1.0);
+        }, 0.9);
       });
 
       return () => ctx.revert();
     } else if (viewState === 'micro') {
       isTransitioning.current = true;
-      const returnPoint = curve.getPointAt(scrollProgress);
-      const returnLookAt = curve.getPointAt(Math.min(1, scrollProgress + 0.02));
+      const targetY = scrollProgress * maxDepth;
+      const returnPosition = new THREE.Vector3(0, targetY, 15);
+      const returnLookAt = new THREE.Vector3(0, targetY, 0);
 
       const ctx = gsap.context(() => {
         const tl = gsap.timeline({
@@ -105,31 +99,31 @@ export default function CameraRig() {
 
         tl.to(camera as THREE.PerspectiveCamera, {
           fov: 80,
-          duration: 0.6,
+          duration: 0.5,
           ease: "power2.in",
           onUpdate: () => (camera as THREE.PerspectiveCamera).updateProjectionMatrix(),
         }, 0);
 
         tl.to(camera.position, {
-          x: returnPoint.x,
-          y: returnPoint.y,
-          z: returnPoint.z,
-          duration: 1.8,
+          x: returnPosition.x,
+          y: returnPosition.y,
+          z: returnPosition.z,
+          duration: 1.5,
           ease: "power3.inOut",
           onUpdate: () => camera.lookAt(returnLookAt),
         }, 0);
 
         tl.to(camera as THREE.PerspectiveCamera, {
           fov: 45,
-          duration: 0.8,
+          duration: 0.6,
           ease: "power3.out",
           onUpdate: () => (camera as THREE.PerspectiveCamera).updateProjectionMatrix(),
-        }, 1.0);
+        }, 0.9);
       });
 
       return () => ctx.revert();
     }
-  }, [activeNode, viewState, curve, scrollProgress, setViewState, camera]);
+  }, [activeNode, viewState, scrollProgress, setViewState, camera]);
 
   return null;
 }
