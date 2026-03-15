@@ -6,6 +6,7 @@ import InstancedStarfield from "./environment/InstancedStarfield";
 import ConstellationGraph from "./nodes/ConstellationGraph";
 import ActiveWorldContainer from "./worlds/ActiveWorldContainer";
 import CameraRig from "./camera/CameraRig";
+import Effects from "./postprocessing/Effects";
 
 export default function Scene() {
   return (
@@ -22,6 +23,9 @@ export default function Scene() {
       <InstancedStarfield count={15000} />
       <ConstellationGraph />
       <ActiveWorldContainer />
+      
+      {/* The Cinematic Lens */}
+      <Effects />
 
       <Preload all />
     </Canvas>
