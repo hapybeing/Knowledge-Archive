@@ -16,7 +16,8 @@ export default function Home() {
   const setContactOpen = useStore((state) => state.setContactOpen);
 
   return (
-    <main className="relative w-screen bg-[#010103] selection:bg-neonCyan selection:text-space">
+    // REMOVED: overflow-hidden. We need the universe to flow.
+    <main className="relative w-full min-h-screen bg-[#010103] selection:bg-neonCyan selection:text-space">
       <ScrollManager />
       <FounderModal />
       
@@ -36,11 +37,14 @@ export default function Home() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.2 }}
-          className="pointer-events-auto px-6 py-2 border border-white/20 rounded-none text-[10px] font-mono tracking-widest text-white hover:border-neonCyan hover:text-neonCyan transition-all duration-300 mix-blend-difference backdrop-blur-sm"
+          className="pointer-events-auto px-6 py-2 border border-white/20 rounded-none text-[10px] font-mono tracking-widest text-white hover:border-neonCyan hover:text-neonCyan transition-all duration-300 backdrop-blur-md bg-black/20"
         >
           [ COMMS ]
         </motion.button>
       </header>
+
+      {/* Deep Shadow Protection Layer - ensures text is ALWAYS readable */}
+      <div className="fixed top-0 left-0 w-full md:w-[60%] h-full bg-gradient-to-r from-[#010103] via-[#010103]/90 to-transparent z-10 pointer-events-none" />
 
       {/* Welcome Sequence (Macro View Only) */}
       <AnimatePresence>
@@ -51,15 +55,15 @@ export default function Home() {
           >
             <SplitText 
               text="Welcome to the sum of human understanding."
-              className="text-4xl md:text-6xl font-light tracking-tighter text-white max-w-4xl"
-              highlightWords={["sum", "understanding"]}
+              className="text-4xl md:text-6xl lg:text-8xl font-light tracking-tighter text-white max-w-5xl"
+              highlightWords={["sum", "understanding."]}
               delay={0.1}
             />
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1.5, duration: 1 }}
-              className="mt-12 text-[10px] font-mono tracking-[0.4em] text-white/40 animate-pulse"
+              className="mt-16 text-[10px] font-mono tracking-[0.4em] text-neonCyan animate-pulse"
             >
               SCROLL TO INITIATE DESCENT ↓
             </motion.div>
@@ -67,7 +71,7 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      {/* The Inner World Overlay */}
+      {/* The Inner World Overlay - Now properly scrollable */}
       <AnimatePresence>
         {viewState === 'micro' && <InnerWorldScroll />}
       </AnimatePresence>
@@ -79,8 +83,10 @@ export default function Home() {
         </Suspense>
       </div>
 
-      {/* Main Scroll Track */}
-      <div className="w-full h-[5000vh] pointer-events-none relative z-10" />
+      {/* Main Scroll Track - Only active in macro mode */}
+      {viewState === 'macro' && (
+        <div className="w-full h-[5000vh] pointer-events-none relative z-10" />
+      )}
     </main>
   );
 }
