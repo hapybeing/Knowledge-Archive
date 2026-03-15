@@ -3,6 +3,7 @@
 import { Canvas } from "@react-three/fiber";
 import { Preload } from "@react-three/drei";
 import InstancedStarfield from "./environment/InstancedStarfield";
+import DataNexus from "./environment/DataNexus";
 import ConstellationGraph from "./nodes/ConstellationGraph";
 import ActiveWorldContainer from "./worlds/ActiveWorldContainer";
 import CameraRig from "./camera/CameraRig";
@@ -15,18 +16,24 @@ export default function Scene() {
       dpr={[1, 2]}
       gl={{ antialias: false, powerPreference: "high-performance" }}
     >
-      <color attach="background" args={["#030305"]} />
-      <ambientLight intensity={0.2} />
+      <color attach="background" args={["#010103"]} />
+      
+      {/* Exponential fog gives depth to the 3D space, masking objects far away */}
+      <fogExp2 attach="fog" color="#010103" density={0.015} />
+      
+      <ambientLight intensity={0.1} />
       
       <CameraRig />
       
-      <InstancedStarfield count={15000} />
+      {/* The Macro Environment */}
+      <DataNexus />
+      <InstancedStarfield count={8000} />
+      
+      {/* The Interactive Elements */}
       <ConstellationGraph />
       <ActiveWorldContainer />
       
-      {/* The Cinematic Lens */}
       <Effects />
-
       <Preload all />
     </Canvas>
   );
