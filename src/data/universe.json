@@ -3,35 +3,35 @@
     "id": "physics",
     "category": "physics",
     "title": "Quantum Mechanics",
-    "coordinates": [3, 2, -40],
+    "coordinates": [4, -20, 0],
     "color": "#00f3ff"
   },
   {
     "id": "ai",
     "category": "artificial intelligence",
     "title": "Neural Architectures",
-    "coordinates": [-5, -1, -80],
+    "coordinates": [4, -40, 0],
     "color": "#b026ff"
   },
   {
     "id": "mathematics",
     "category": "mathematics",
     "title": "Fractal Geometry",
-    "coordinates": [4, 3, -120],
+    "coordinates": [4, -60, 0],
     "color": "#003cff"
   },
   {
     "id": "cybernetics",
     "category": "cybernetics",
     "title": "Synthetic Evolution",
-    "coordinates": [-4, 1, -160],
+    "coordinates": [4, -80, 0],
     "color": "#ff003c"
   },
   {
     "id": "cosmology",
     "category": "cosmology",
     "title": "Stellar Cartography",
-    "coordinates": [0, -2, -200],
+    "coordinates": [4, -100, 0],
     "color": "#ffb000"
   }
 ]
