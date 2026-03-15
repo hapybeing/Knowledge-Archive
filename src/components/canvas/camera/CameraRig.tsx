@@ -16,28 +16,25 @@ export default function CameraRig() {
   
   const isTransitioning = useRef(false);
 
-  // The master flight path. Offsets ensure nodes appear on the right side of the screen.
   const curve = useMemo(() => {
     return new THREE.CatmullRomCurve3([
-      new THREE.Vector3(0, 0, 15),               // Start
-      new THREE.Vector3(1, 2, -10 + 6),          // Physics approach
-      new THREE.Vector3(-6, -1, -30 + 6),        // AI approach
-      new THREE.Vector3(0, 3, -50 + 6),          // Math approach
-      new THREE.Vector3(-5, 1, -70 + 6),         // Cybernetics approach
-      new THREE.Vector3(-2, -2, -90 + 6),        // Cosmology approach
-      new THREE.Vector3(0, 0, -110),             // Deep space
+      new THREE.Vector3(0, 0, 15),               
+      new THREE.Vector3(1, 2, -10 + 6),          
+      new THREE.Vector3(-6, -1, -30 + 6),        
+      new THREE.Vector3(0, 3, -50 + 6),          
+      new THREE.Vector3(-5, 1, -70 + 6),         
+      new THREE.Vector3(-2, -2, -90 + 6),        
+      new THREE.Vector3(0, 0, -110),             
     ]);
   }, []);
 
   useFrame(() => {
     if (viewState === 'macro' && !isTransitioning.current) {
-      // Map scroll progress (0-1) to the curve length
       const point = curve.getPointAt(scrollProgress);
       const lookAtPoint = curve.getPointAt(Math.min(1, scrollProgress + 0.02));
       
-      camera.position.lerp(point, 0.08); // Smooth dampening
+      camera.position.lerp(point, 0.08); 
       
-      // Add subtle mouse sway for a premium feel
       const mouseX = (window.innerWidth / 2 - window.innerWidth) * 0.0005;
       const mouseY = (window.innerHeight / 2 - window.innerHeight) * 0.0005;
       lookAtPoint.x += mouseX;
@@ -54,8 +51,11 @@ export default function CameraRig() {
       if (!targetNode) return;
 
       const [x, y, z] = targetNode.coordinates;
-      const targetPosition = new THREE.Vector3(x - 2, y, z + 6); 
-      const lookAtTarget = new THREE.Vector3(x - 2, y, z);
+      
+      // FIXED: Massive X offset to push the orb to the far right of the screen
+      // so it never overlaps the FWA typography on tablets or mobile.
+      const targetPosition = new THREE.Vector3(x + 4, y, z + 6); 
+      const lookAtTarget = new THREE.Vector3(x + 4, y, z);
 
       const ctx = gsap.context(() => {
         const tl = gsap.timeline({
@@ -66,7 +66,7 @@ export default function CameraRig() {
         });
 
         tl.to(camera as THREE.PerspectiveCamera, {
-          fov: 100,
+          fov: 90,
           duration: 0.8,
           ease: "power2.in",
           onUpdate: () => (camera as THREE.PerspectiveCamera).updateProjectionMatrix(),
